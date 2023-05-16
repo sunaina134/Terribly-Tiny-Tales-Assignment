@@ -2,6 +2,12 @@ import React, { useState } from 'react';
 import { VictoryPie, VictoryTooltip } from 'victory';
 import "./Histo.css"
 
+const SubmitButton = ({ handleButtonClick, isLoading }) => (
+  <button type="button" onClick={handleButtonClick} disabled={isLoading}>
+    {isLoading ? 'Loading...' : 'Submit'}
+  </button>
+);
+
 const App = () => {
   // Initialize state
   const [wordFrequency, setWordFrequency] = useState({});
@@ -58,9 +64,7 @@ const App = () => {
 
   return (
     <>
-      <button id='submit' type="button" onClick={handleButtonClick} disabled={isLoading}>
-        {isLoading ? 'Loading...' : 'Submit'}
-      </button>
+      {!pieData.length && <SubmitButton handleButtonClick={handleButtonClick} isLoading={isLoading} />}
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         {pieData.length > 0 && (
           <div className='container'>

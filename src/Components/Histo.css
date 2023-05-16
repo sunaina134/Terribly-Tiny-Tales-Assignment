@@ -12,6 +12,8 @@ body {
     padding: .6rem .4rem .6rem .4rem;
     font-weight: 600;
     color: #ffffff;
+    display: block;
+    margin: 0 auto;
   }
   
   button:hover {
