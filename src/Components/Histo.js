@@ -55,7 +55,9 @@ const App = () => {
   return (
     <div className='container'>
       <h2>Word Frequency Histogram</h2>
-     
+      <button type="button" onClick={handleButtonClick} disabled={isLoading}>
+        {isLoading ? 'Loading...' : 'Submit'}
+      </button>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
         {histogramData.length > 0 && (
           <BarChart width={800} height={470} data={histogramData}>
