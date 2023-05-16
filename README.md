@@ -1,4 +1,4 @@
-#Deplyed Link
+#Deployed Link
 
 https://terribly-tiny-tales-sub.vercel.app/
 
