@@ -1,52 +1,38 @@
 import React, { useState } from 'react';
-import { VictoryPie, VictoryTooltip } from 'victory';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import "./Histo.css"
 
-const SubmitButton = ({ handleButtonClick, isLoading }) => (
-  <button type="button" onClick={handleButtonClick} disabled={isLoading}>
-    {isLoading ? 'Loading...' : 'Submit'}
-  </button>
-);
-
 const App = () => {
-  // Initialize state
   const [wordFrequency, setWordFrequency] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch data and update state on button click
-  const handleButtonClick = async () => {
+  const handleButtonClick = () => {
     setIsLoading(true);
-
-    try {
-      const response = await fetch('https://www.terriblytinytales.com/test.txt');
-      const data = await response.text();
-      const words = data.split(/\s+/);
-      const frequency = words.reduce((acc, word) => {
-        acc[word] = (acc[word] || 0) + 1;
-        return acc;
-      }, {});
-      setWordFrequency(frequency);
-
-      // Slide out submit button
-      const submit = document.getElementById("submit");
-      submit.style.left="49vw";
-      submit.style.animationName="slideOut";
-    } catch (error) {
-      console.error('Error:', error);
-    }
-
-    setIsLoading(false);
+    fetch('https://www.terriblytinytales.com/test.txt')
+      .then(response => response.text())
+      .then(data => {
+        const words = data.split(/\s+/);
+        const frequency = words.reduce((acc, word) => {
+          acc[word] = (acc[word] || 0) + 1;
+          return acc;
+        }, {});
+        setWordFrequency(frequency);
+        setIsLoading(false);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        setIsLoading(false);
+      });
   };
 
-  // Generate CSV and download on export button click
   const handleExportClick = () => {
-    const csvData = Object.entries(wordFrequency)
+    let csvContent = Object.entries(wordFrequency)
       .sort((a, b) => b[1] - a[1])
       .slice(0, 20)
-      .map(([word, frequency]) => `${word},${frequency}`);
+      .map(([word, frequency]) => `${word},${frequency}`)
+    csvContent.unshift("Word, Frequency")
+    csvContent = csvContent.join('\n');
 
-    csvData.unshift("Word, Frequency");
-    const csvContent = csvData.join('\n');
     const element = document.createElement('a');
     const file = new Blob([csvContent], { type: 'text/csv' });
     element.href = URL.createObjectURL(file);
@@ -56,33 +42,41 @@ const App = () => {
     document.body.removeChild(element);
   };
 
-  // Generate pie chart data and render chart
-  const pieData = Object.entries(wordFrequency)
+  const colors = ['#E57373', '#F06292', '#BA68C8', '#9575CD', '#7986CB', '#64B5F6', '#4FC3F7', '#4DD0E1', '#4DB6AC', '#81C784', '#AED581', '#DCE775', '#FFB74D', '#FF8A65', '#A1887F', '#E0E0E0', '#90A4AE'];
+
+
+
+
+  const histogramData = Object.entries(wordFrequency)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 20)
-    .map(([word, frequency]) => ({ x: word, y: frequency }));
+    .map(([word, frequency], index) => ({ word, frequency, fill: colors[index % colors.length] }));
 
   return (
-    <>
-      {!pieData.length && <SubmitButton handleButtonClick={handleButtonClick} isLoading={isLoading} />}
+    <div className='container'>
+      <h2>Word Frequency Histogram</h2>
+     
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        {pieData.length > 0 && (
-          <div className='container'>
-            <h2>Word Frequency Pie Chart</h2>
-            <VictoryPie
-              data={pieData}
-              colorScale={['#003f5c', '#2f4b7c', '#665191', '#a05195', '#d45087', '#f95d6a', '#ff7c43', '#ffa600']}
-              labelComponent={<VictoryTooltip />}
-              labels={({ datum }) => `${datum.x}: ${datum.y}`}
-            />
-            <button type="button" onClick={handleExportClick}>
-              Export
-            </button>
-          </div>
+        {histogramData.length > 0 && (
+          <BarChart width={800} height={470} data={histogramData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="word" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="frequency" name="Frequency" />
+          </BarChart>
         )}
       </div>
-    </>
+      {histogramData.length > 0 && (
+        <button type="button" onClick={handleExportClick}>
+          Export
+        </button>
+      )}
+    </div>
   );
 };
+
+
 
 export default App;
