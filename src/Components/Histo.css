@@ -23,7 +23,7 @@ body {
   }
   
   h2 {
-    background: linear-gradient(120deg, #8568af, #c1b0d1);
+    background: #5C469C;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
